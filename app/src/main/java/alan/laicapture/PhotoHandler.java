@@ -17,6 +17,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+
+/*
+ * Resuelve el manejo de la imagen y su almacenamiento dentro de la memoria
+ * interna del telefono.
+ * De momento se esta guardando en formato .jpg y funciona (se pueden abrir desde el celular)
+ * TODO: Pero no se esta verificando la calidad de la imagen.
+ * TODO: Se podria realizar una compresion para que ocupe menos espacio
+ * TODO: En que formato nos sirve mas? JPG, BMP?
+ */
 public class PhotoHandler implements PictureCallback {
 
     private final Context context;
@@ -73,6 +82,10 @@ public class PhotoHandler implements PictureCallback {
     }
 
 
+    /*
+     * Crea el subdirectorio donde se almacenaran las imagenes dentro del directorio de imagenes
+     * de la memoria interna
+     */
     private File getDir() {
         File sdDir = Environment
                 .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);

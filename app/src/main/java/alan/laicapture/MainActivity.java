@@ -17,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+
+
 public class MainActivity extends ActionBarActivity implements SensorEventListener {
 
     CameraPreview cv;
@@ -28,57 +30,72 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
 
     @Override
+    /*
+     * Llamada al momento de iniciarse la app
+     * SensorManager mSensorManager: Se encarga de administrar los sensores
+     * Sensor accelerometer        : El sensor acelerometro, instancia de Sensor
+     *                                  necesaria para registrar el mismo en mSensorManager
+     * Camera c                    : Instancia de android.hardware.Camera que se utiliza
+     *                                  para generar la previsualizacion de la camara
+     *                                  (Camera Preview) y tomar la foto
+     * CameraPreview cv            : Objeto que soluciona la parte de mostrar el CameraPreview
+     *                                  en pantalla
+     *
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        // requesting to turn the title OFF
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
-        // making it full screen
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        //WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_main); //"Dibuja" lo que esta en activity_main.xmkl
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
         //Defino los sensores que voy a utilizar
         accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+        //Los registro
         initListeners();
 
 
-        // Try to get the camera
+        // Trato de obtener una instancia de camera
         Camera c = getCameraInstance();
 
-        // If the camera was received, create the app
+        // Si se pudo obtener con exito, buscio generar el preview
         if (c != null) {
         	/* Create our layout in order to layer the
         	 * draw view on top of the camera preview.
+        	 * TODO: Verificar si la parte del Frame configurada aca es indispensable
+        	 * TODO: Esta haciendo algo siquiera?
         	 */
             alParent = new FrameLayout(this);
             alParent.setLayoutParams(new LayoutParams(
                     LayoutParams.FILL_PARENT,
                     LayoutParams.FILL_PARENT));
 
-            // Create a new camera view and add it to the layout
-            cv = new CameraPreview(this, c);
-            FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-            preview.addView(cv);
 
-            // Add a listener to the Capture button
+            cv = new CameraPreview(this, c); //Crea un nuevo CameraPreview
+            FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+            preview.addView(cv); //LLena el FrameLayout creado en el activity_main.xml
+
+
             Button captureButton = (Button) findViewById(R.id.btnfoto);
+            //Agrega un listener para capturar el evento del presionado del boton
+            //Esto es una funcion codificada en el momento
+            //TODO: vale la pena emprolijar esto?
             captureButton.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            // get an image from the camera
+                            //Llama indirectamente a takePicture de android.hardware.Camera
                             cv.takePicture(null, null, new PhotoHandler(getApplicationContext()));
+                            //Permite que la visualiazacion de la preview continue y no se trabe la
+                            //imagen
                             cv.resume();
                         }
                     }
             );
         }
 
-        // If the camera was not received, close the app
+        // Si no se pudo obtener una instancia de la camara, se informa y cerramos la app
         else {
             Toast toast = Toast.makeText(getApplicationContext(),
                     "Unable to find camera. Closing.", Toast.LENGTH_SHORT);
@@ -87,16 +104,19 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
     }
 
-   /* public void onClick(View view) {
-        cv.takePicture(null, null,
-                new PhotoHandler(getApplicationContext()));
-    }*/
-
+    /*
+     * Registra los sensores que se estaran utilizando
+     * En este momento solo se registra al acelerometro
+     */
     public void initListeners()
     {
         mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+    /*
+     * Muestra el menu en el main
+     */
+    //TODO : Verificar si lo esta haciendo, ver si lo necesitamos para algo, sino borrarlo
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -104,6 +124,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         return true;
     }
 
+    /*
+     * Respuesta a la seleccion de opcion en el menu
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -119,6 +142,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         return super.onOptionsItemSelected(item);
     }
 
+    /*
+     * Trata de crear el objeto Camera que se estara utilizando en la app
+     * Si falla al crearla, le hace un catch a la Exception
+     * TODO: Hacer que en el catch muestre un mensaje TOAST de que no pudo levantar la camara
+     */
     public static Camera getCameraInstance(){
         Camera c = null;
         try {
@@ -132,6 +160,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     //Serie de funciones que deshabilitan la lectura de los sensores cuando
     //el dispositivo esta bloqueado, o al cerrarse la aplicacion
+
+    /*
+     * Funcion de respuesta ante la finalizacion de la aplicacion (cierre)
+     * Desregistrando el sensor se supone que deja de leerlo y por consiguiente
+     * deja de consumir energia.
+     */
     @Override
     public void onDestroy()
     {
@@ -139,6 +173,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         super.onDestroy();
     }
 
+    /*
+     * Respuesta ante suspension del telefono
+     * Desregistra los sensores
+     */
     @Override
     public void onBackPressed()
     {
@@ -146,6 +184,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         super.onBackPressed();
     }
 
+    /* Funcion de respuesta ante el resumen de la app luego de la suspension
+       del movil.
+     * Habilita nuevamente los sensores llamando a initListeners()
+     * la camara con cv.resume() y el resto de la app con super.onResume()
+     */
     @Override
     public void onResume()
     {
@@ -154,6 +197,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         super.onResume();
     }
 
+    /*
+     * No se cuando pasa esto, sera al bloquearlo?*
+     * TODO: Definir si el bloqueo del telefono sucede aca o en onBackPressed
+     */
     @Override
     protected void onPause()
     {
@@ -170,12 +217,16 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     //y su visualizacion
 
     float[] inclineGravity = new float[3];
-    float[] mGravity;
-    float orientation[] = new float[3];
+    float[] mGravity;   //Tendra la lectura bruta del acelerometro
+                        // (aparentemente el valor de la gravedad en cada eje)
+                        //TODO: Medido en que unidad?
+    float orientation[] = new float[3]; //TODO: Se esta usando?
 
-    //Funcion que se ejecuta cada vez que hay un evento del tipo SensorEvent
-    //Para agregar sensores a la lista se usa mSensorManager.registerListener
-    //en initListeners()
+
+    /*
+     * Funcion que se ejecuta cada vez que hay un evento del tipo SensorEvent
+     * Para agregar sensores a la lista se usa mSensorManager.registerListener en initListeners()
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
 
@@ -194,28 +245,36 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         tv_x.setText(Integer.toString(inclination[0]));
         tv_y.setText(Integer.toString(inclination[1]));
         tv_z.setText(Integer.toString(inclination[2]));
-
     }
 
+
+    //Metodo autogenerado necesario
+    //TODO: Nos sirve de algo?
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // TODO Auto-generated method stub
 
     }
 
-    //Devuelve la inclinacion obtenida a partir de la gravedad sensada por cada eje
+
+    /*
+     * Devuelve la inclinacion obtenida a partir de la gravedad sensada por cada eje
+     */
     public int[] get_inclination()
     {
         inclineGravity = mGravity.clone();
 
+        //Se obtiene la norma del vector gravedad, que contiene la lectura de la misma en cada eje (x,y,z)
         double norm_Of_g = Math.sqrt(inclineGravity[0] * inclineGravity[0] + inclineGravity[1] * inclineGravity[1] + inclineGravity[2] * inclineGravity[2]);
 
-        // Normalize the accelerometer vector
+        //Normalizacion del vector aceleracion (el de la gravedad leida en cada eje)
         inclineGravity[0] = (float) (inclineGravity[0] / norm_Of_g);
         inclineGravity[1] = (float) (inclineGravity[1] / norm_Of_g);
         inclineGravity[2] = (float) (inclineGravity[2] / norm_Of_g);
 
-        //Checks if device is flat on ground or not
+        //Se convierte el valor raw obtenido por el sensor (TODO: EN QUE MAGNITUD??)
+        //a grados. Se realiza una aproximacion de decimales tambien para quedarnos con
+        //la parte entera nada mas.
         int inclination [] = {0,0,0};
         inclination[0] = (int) Math.round(Math.toDegrees(Math.acos(inclineGravity[0])));
         inclination[1] = (int) Math.round(Math.toDegrees(Math.acos(inclineGravity[1])));
