@@ -1,12 +1,4 @@
-# README #
-
-
-Commits
-Alan Vaudagna committed 1aef4fa
-an hour ago
-Approve
-
-First commit, up to the moment the proyect has the following features:
+Up to the moment the proyect has the following features:
 
 	* Can show the camera preview with the screen divided
 
