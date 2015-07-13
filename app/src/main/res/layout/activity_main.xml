@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/LinearLayout01"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:background="#FFFFFF">
+
+    <FrameLayout
+        android:layout_width="286dp"
+        android:layout_height="fill_parent"
+        android:id="@+id/camera_preview"
+        android:layout_weight="1"></FrameLayout>
+
+
+    <LinearLayout android:id="@+id/LinearLayout02"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:background="#0066FF"
+        android:gravity="center_vertical">
+
+
+        <TextView
+            android:id="@+id/x_axis"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:textColor="#FFFFFF"
+            android:textSize="20px"
+            android:textStyle="bold"
+            android:text="0"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/y_axis"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:textColor="#FFFFFF"
+            android:textSize="20px"
+            android:textStyle="bold"
+            android:text="0"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/z_axis"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:textColor="#FFFFFF"
+            android:textSize="20px"
+            android:textStyle="bold"
+            android:text="0"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:id="@+id/btnfoto"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_margin="5dip"
+            android:layout_gravity="center_horizontal"
+            android:text="TAKE" />
+
+    </LinearLayout>
+</LinearLayout>
