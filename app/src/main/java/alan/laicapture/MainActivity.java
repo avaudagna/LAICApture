@@ -16,7 +16,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 
 public class MainActivity extends ActionBarActivity implements SensorEventListener {
@@ -223,6 +224,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     float orientation[] = new float[3]; //TODO: Se esta usando?
 
 
+
+
+    int ocurrences = 0;
     /*
      * Funcion que se ejecuta cada vez que hay un evento del tipo SensorEvent
      * Para agregar sensores a la lista se usa mSensorManager.registerListener en initListeners()
@@ -236,15 +240,31 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             mGravity = event.values;
         }
 
-        int inclination[] = get_inclination();
+        float inclination [] = get_inclination();
 
-        TextView tv_x = (TextView)findViewById(R.id.x_axis);
-        TextView tv_y = (TextView)findViewById(R.id.y_axis);
-        TextView tv_z = (TextView)findViewById(R.id.z_axis);
 
-        tv_x.setText(Integer.toString(inclination[0]));
-        tv_y.setText(Integer.toString(inclination[1]));
-        tv_z.setText(Integer.toString(inclination[2]));
+        //Hago esto para solo tomar 1 de cada 10 mediciones
+        //De esta forma lo que marcara el TextView sera el valor real medido y no un
+        //promedio de la misma como seria haciendo un promedio de las n mediciones medidas
+        // (la media)
+        if(ocurrences < 10) {
+            ocurrences ++;
+        }
+        else {
+            ocurrences=0;
+
+            //Para quedarme solo con 2 decimales de la medicion
+            DecimalFormat df = new DecimalFormat("##.##");
+            df.setRoundingMode(RoundingMode.DOWN);
+
+            TextView tv_x = (TextView) findViewById(R.id.x_axis);
+            TextView tv_y = (TextView) findViewById(R.id.y_axis);
+            TextView tv_z = (TextView) findViewById(R.id.z_axis);
+
+            tv_x.setText(df.format(inclination[0]).toString());
+            tv_y.setText(df.format(inclination[1]).toString());
+            tv_z.setText(df.format(inclination[2]).toString());
+        }
     }
 
 
@@ -259,8 +279,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     /*
      * Devuelve la inclinacion obtenida a partir de la gravedad sensada por cada eje
+     * sin redondear los decimales obtenidos
      */
-    public int[] get_inclination()
+    public float[] get_inclination()
     {
         inclineGravity = mGravity.clone();
 
@@ -275,13 +296,15 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         //Se convierte el valor raw obtenido por el sensor (TODO: EN QUE MAGNITUD??)
         //a grados. Se realiza una aproximacion de decimales tambien para quedarnos con
         //la parte entera nada mas.
-        int inclination [] = {0,0,0};
-        inclination[0] = (int) Math.round(Math.toDegrees(Math.acos(inclineGravity[0])));
-        inclination[1] = (int) Math.round(Math.toDegrees(Math.acos(inclineGravity[1])));
-        inclination[2] = (int) Math.round(Math.toDegrees(Math.acos(inclineGravity[2])));
+        float  inclination [] = {0,0,0};
+        inclination[0] = (float) (Math.toDegrees(Math.acos(inclineGravity[0])));
+        inclination[1] = (float) (Math.toDegrees(Math.acos(inclineGravity[1])));
+        inclination[2] = (float) (Math.toDegrees(Math.acos(inclineGravity[2])));
 
         return inclination;
     }
+
+
 
 
 }
