@@ -226,7 +226,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
 
 
-    int ocurrences = 0;
+    int occurrences = 0;
     /*
      * Funcion que se ejecuta cada vez que hay un evento del tipo SensorEvent
      * Para agregar sensores a la lista se usa mSensorManager.registerListener en initListeners()
@@ -249,11 +249,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         // (la media)
         //Se decidio dejar pasar 10 como regla empirica, si se necesita que se vea una
         //respuesta mas rapida se puede poner un numero menor o 0
-        if(ocurrences < 10) {
-            ocurrences ++;
+        if(occurrences < 10) {
+            occurrences++;
         }
         else {
-            ocurrences=0;
+            occurrences =0;
 
             //Para quedarme solo con 2 decimales de la medicion
             DecimalFormat df = new DecimalFormat("##.##");
